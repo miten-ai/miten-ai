@@ -3,149 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miten.ai | Ultimate Super AI</title>
+    <title>miten.ai</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: radial-gradient(circle at top right, #1a1a2e, #09090e); height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; }
-        .chat-container { width: 100%; max-width: 850px; height: 88vh; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.6); margin: 20px; }
-        .chat-header { padding: 20px 24px; background: rgba(255, 255, 255, 0.01); border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: space-between; }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-dot { width: 12px; height: 12px; background: #00ffaa; border-radius: 50%; box-shadow: 0 0 12px #00ffaa; }
-        .chat-header h1 { font-size: 22px; font-weight: 600; background: linear-gradient(45deg, #00ffaa, #00bfff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .controls { display: flex; gap: 10px; }
-        .btn-clear { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.3); color: #ff4a4a; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
-        .btn-clear:hover { background: #ff4a4a; color: #fff; }
-        #chat-box { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
-        .message-wrapper { display: flex; flex-direction: column; width: 100%; }
-        .message { padding: 14px 20px; border-radius: 18px; max-width: 75%; line-height: 1.6; font-size: 15px; position: relative; word-wrap: break-word; }
-        .user { background: linear-gradient(135deg, #0052d4, #4364f7); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(67, 100, 247, 0.25); }
-        .ai { background: rgba(255, 255, 255, 0.05); color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.04); }
-        .ai p { margin-bottom: 8px; } .ai p:last-child { margin-bottom: 0; }
-        .ai strong { color: #00ffaa; }
-        .msg-tools { display: flex; gap: 10px; margin-top: 6px; font-size: 12px; color: #888; }
-        .tool-btn { cursor: pointer; background: none; border: none; color: #a0a0b8; font-size: 12px; box-shadow: none; padding: 0; }
-        .tool-btn:hover { color: #fff; }
-        #input-area { padding: 20px 24px; background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; gap: 12px; align-items: center; }
-        input { flex: 1; padding: 16px 20px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; color: white; font-size: 15px; outline: none; transition: 0.3s; }
-        input:focus { border-color: #00ffaa; background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 15px rgba(0, 255, 170, 0.1); }
-        button { padding: 16px 32px; background: linear-gradient(45deg, #00ffaa, #00bfff); color: #09090e; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 15px; transition: 0.3s; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 170, 0.3); }
-        .typing { color: #00ffaa; font-size: 13px; margin-left: 24px; margin-bottom: 10px; display: none; }
+        :root {
+            --bg-main: #212121; --bg-sidebar: #171717; --text-color: #ececec;
+            --chat-user: #2f2f2f; --chat-ai: transparent; --border-color: rgba(255,255,255,0.08);
+            --accent: #10a37f; --input-bg: #2f2f2f;
+        }
+        .light-theme {
+            --bg-main: #ffffff; --bg-sidebar: #f9f9f9; --text-color: #0d0d0d;
+            --chat-user: #f4f4f4; --chat-ai: transparent; --border-color: rgba(0,0,0,0.08);
+            --accent: #10a37f; --input-bg: #f4f4f4;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s, color 0.3s; }
+        body { background: var(--bg-main); height: 100vh; display: flex; color: var(--text-color); overflow: hidden; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 12px; }
+        .new-chat-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .new-chat-btn:hover { background: rgba(255,255,255,0.05); }
+        .light-theme .new-chat-btn:hover { background: rgba(0,0,0,0.05); }
+        .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .history-item { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item:hover { background: rgba(255,255,255,0.05); }
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; margin-top: auto; }
+
+        /* Main Chat Area */
+        .chat-area { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
+        .top-bar { padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .top-bar h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+        
+        /* Welcome Screen */
+        .welcome-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
+        .welcome-container h1 { font-size: 32px; font-weight: 600; margin-bottom: 40px; }
+        .suggestions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; width: 100%; }
+        .suggestion-card { background: var(--input-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; cursor: pointer; text-align: left; font-size: 14px; }
+        .suggestion-card:hover { filter: brightness(1.1); }
+
+        /* Chat Messages */
+        #messages-container { flex: 1; overflow-y: auto; padding: 40px 20%; display: none; flex-direction: column; gap: 24px; }
+        .msg-row { display: flex; width: 100%; flex-direction: column; }
+        .msg-row.user-row { align-items: flex-end; }
+        .msg-row.ai-row { align-items: flex-start; }
+        .bubble { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px; word-wrap: break-word; }
+        .bubble.user-bubble { background: var(--chat-user); color: var(--text-color); }
+        .bubble.ai-bubble { background: var(--chat-ai); color: var(--text-color); }
+        .bubble strong { color: var(--accent); }
+        .actions-bar { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; opacity: 0.6; padding-left: 6px; }
+        .action-btn { cursor: pointer; background: none; border: none; color: var(--text-color); }
+
+        /* Input Area */
+        .input-container { padding: 20px 20% 30px 20%; background: linear-gradient(transparent, var(--bg-main) 20%); }
+        .input-box-wrapper { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; padding: 8px 16px; gap: 10px; }
+        input { flex: 1; background: transparent; border: none; color: var(--text-color); padding: 10px 4px; font-size: 16px; outline: none; }
+        .icon-btn { background: transparent; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 6px; opacity: 0.7; }
+        .icon-btn:hover { opacity: 1; }
+        .send-btn { background: var(--text-color); color: var(--bg-main); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+        .typing-indicator { font-size: 13px; color: var(--accent); margin-left: 20%; margin-bottom: 5px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <div class="chat-header">
-            <div class="logo-area">
-                <div class="logo-dot"></div>
-                <h1>miten.ai</h1>
-            </div>
-            <div class="controls">
-                <button class="btn-clear" onclick="clearMemory()">નવી ચેટ (Clear)</button>
-            </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <button class="new-chat-btn" onclick="startNewChat()">New chat <span>+</span></button>
+        <div class="history-list" id="history-box"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌗 Change Theme</button>
+    </div>
+
+    <!-- Main Chat Content -->
+    <div class="chat-area">
+        <div class="top-bar">
+            <h2>miten.ai</h2>
         </div>
-        
-        <div id="chat-box">
-            <div class="message-wrapper" style="align-items: flex-start;">
-                <div class="message ai">હેલો ભાઈ! હું Miten.ai છું. હવે હું લાઈવ થવા માટે એકદમ રેડી છું. કંઈપણ પૂછો! 🔥</div>
+
+        <!-- Welcome View -->
+        <div class="welcome-container" id="welcome-screen">
+            <h1>What can I help with today?</h1>
+            <div class="suggestions-grid">
+                <div class="suggestion-card" onclick="useSuggestion('મને મસ્ત કોડિંગ શીખવાડ ભાઈ!')">💡 Learn Coding <br><span style="opacity:0.6;font-size:12px;">મને મસ્ત કોડિંગ શીખવાડ ભાઈ!</span></div>
+                <div class="suggestion-card" onclick="useSuggestion('ઇન્સ્ટાગ્રામ રીલ માટે મસ્ત કેપ્શન લખી આપ')">✍️ Write a Caption <br><span style="opacity:0.6;font-size:12px;">ઇન્સ્ટાગ્રામ રીલ માટે મસ્ત કેપ્શન લખી આપ</span></div>
+                <div class="suggestion-card" onclick="useSuggestion('તારા વિશે કઈક ખાસ જણાવ')">🤖 About miten.ai <br><span style="opacity:0.6;font-size:12px;">તારા વિશે કઈક ખાસ જણાવ</span></div>
+                <div class="suggestion-card" onclick="useSuggestion('આજે કોઈ કૂલ ગુજરાતી શાયરી સંભળાવ')">🎭 Entertainment <br><span style="opacity:0.6;font-size:12px;">આજે કોઈ કૂલ ગુજરાતી શાયરી સંભળાવ</span></div>
             </div>
         </div>
 
-        <div class="typing" id="typing-loader">Miten.ai વિચારી રહ્યું છે...</div>
+        <!-- Actual Chat Messages View -->
+        <div id="messages-container"></div>
+        <div class="typing-indicator" id="loader">miten.ai is typing...</div>
 
-        <div id="input-area">
-            <input type="text" id="user-input" placeholder="અહીં કંઈપણ સ્માર્ટ પૂછો..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">પૂછો</button>
+        <!-- Input Area -->
+        <div class="input-container">
+            <div class="input-box-wrapper">
+                <button class="icon-btn" onclick="startVoiceInput()" title="Voice Input">🎙️</button>
+                <input type="text" id="user-msg-input" placeholder="Message miten.ai..." onkeypress="if(event.key === 'Enter') handleSend()">
+                <button class="icon-btn send-btn" onclick="handleSend()">↑</button>
+            </div>
         </div>
     </div>
 
     <script>
-        function speak(text) {
+        let chatHistory = [];
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+        }
+
+        function useSuggestion(text) {
+            document.getElementById('user-msg-input').value = text;
+            handleSend();
+        }
+
+        // સ્પીચ-ટુ-ટેક્સ્ટ (માઇક ફીચર)
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("તમારા બ્રાઉઝરમાં વોઈસ ટાઈપિંગ સપોર્ટ નથી ભાઈ!");
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'gu-IN'; 
+            recognition.start();
+            document.getElementById('user-msg-input').placeholder = "હું સાંભળું છું, બોલો ભાઈ...";
+            
+            recognition.onresult = function(event) {
+                const resultText = event.results[0][0].transcript;
+                document.getElementById('user-msg-input').value = resultText;
+                document.getElementById('user-msg-input').placeholder = "Message miten.ai...";
+            };
+        }
+
+        function startNewChat() {
+            fetch('/api/clear', { method: 'POST' });
+            document.getElementById('messages-container').innerHTML = '';
+            document.getElementById('messages-container').style.display = 'none';
+            document.getElementById('welcome-screen').style.display = 'flex';
+        }
+
+        function copyBox(btn, text) {
+            navigator.clipboard.writeText(text.replace(/<\/?[^>]+(>|$)/g, ""));
+            btn.textContent = "Copied!";
+            setTimeout(() => btn.textContent = "Copy 📋", 2000);
+        }
+
+        function speakBox(text) {
             window.speechSynthesis.cancel();
-            const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
-            const utterance = new SpeechSynthesisUtterance(cleanText);
+            const utterance = new SpeechSynthesisUtterance(text.replace(/<\/?[^>]+(>|$)/g, ""));
             utterance.lang = 'gu-IN';
             window.speechSynthesis.speak(utterance);
         }
 
-        function copyText(btn, text) {
-            const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
-            navigator.clipboard.writeText(cleanText);
-            btn.textContent = "Copied! ✓";
-            setTimeout(() => btn.textContent = "Copy 📋", 2000);
-        }
+        async function handleSend() {
+            const input = document.getElementById('user-msg-input');
+            const text = input.value.trim();
+            if (!text) return;
 
-        function typeEffect(element, htmlContent, rawText) {
-            element.innerHTML = htmlContent;
-            speak(rawText);
-        }
+            // સાઇડબાર હિસ્ટ્રી મેનેજમેન્ટ
+            if (chatHistory.indexOf(text) === -1) {
+                chatHistory.push(text);
+                const hBox = document.getElementById('history-box');
+                hBox.innerHTML += `<div class="history-item" onclick="document.getElementById('user-msg-input').value='${text}'; handleSend();">💬 ${text}</div>`;
+            }
 
-        async function sendMessage() {
-            const inputField = document.getElementById('user-input');
-            const chatBox = document.getElementById('chat-box');
-            const loader = document.getElementById('typing-loader');
-            const messageText = inputField.value.trim();
+            document.getElementById('welcome-screen').style.display = 'none';
+            const container = document.getElementById('messages-container');
+            container.style.display = 'flex';
 
-            if (!messageText) return;
-
-            chatBox.innerHTML += `
-                <div class="message-wrapper" style="align-items: flex-end;">
-                    <div class="message user">${messageText}</div>
+            // યુઝર મેસેજ
+            container.innerHTML += `
+                <div class="msg-row user-row">
+                    <div class="bubble user-bubble">${text}</div>
                 </div>`;
-            inputField.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            loader.style.display = 'block';
+            
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+            document.getElementById('loader').style.display = 'block';
 
             try {
-                // અહીંથી localhost કાઢી નાખ્યું છે જેથી ઓનલાઇન લિંક પર આ સીધું ચાલે
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageText })
+                    body: JSON.stringify({ message: text })
                 });
                 const data = await response.json();
-                loader.style.display = 'none';
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'message-wrapper';
-                wrapper.style.alignItems = 'flex-start';
-
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'message ai';
-                
-                const toolsDiv = document.createElement('div');
-                toolsDiv.className = 'msg-tools';
-                
-                wrapper.appendChild(aiDiv);
-                wrapper.appendChild(toolsDiv);
-                chatBox.appendChild(wrapper);
+                document.getElementById('loader').style.display = 'none';
 
                 const parsedHTML = marked.parse(data.reply);
-                typeEffect(aiDiv, parsedHTML, data.reply);
+                const escapedText = data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${');
 
-                toolsDiv.innerHTML = `
-                    <button class="tool-btn" onclick="copyText(this, \`${data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${')}\`)">Copy 📋</button>
-                    <button class="tool-btn" onclick="speak(\`${data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${')}\`)">Speak 🔊</button>
-                `;
+                container.innerHTML += `
+                    <div class="msg-row ai-row">
+                        <div class="bubble ai-bubble">${parsedHTML}</div>
+                        <div class="actions-bar">
+                            <button class="action-btn" onclick="copyBox(this, \`${escapedText}\`)">Copy 📋</button>
+                            <button class="action-btn" onclick="speakBox(\`${escapedText}\`)">Speak 🔊</button>
+                        </div>
+                    </div>`;
+                
+                speakBox(data.reply);
+                container.scrollTop = container.scrollHeight;
 
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-            } catch (error) {
-                loader.style.display = 'none';
-                chatBox.innerHTML += `<div class="message ai" style="color:#ff4a4a;">ભૂલ: કનેક્શન તૂટી ગયું.</div>`;
+            } catch (e) {
+                document.getElementById('loader').style.display = 'none';
+                container.innerHTML += `<div class="msg-row ai-row"><div class="bubble ai-bubble" style="color:#ff4a4a;">સર્વરમાં કોઈ ખામી આવી ભાઈ! 🛠️</div></div>`;
             }
-        }
-
-        async function clearMemory() {
-            await fetch('/api/clear', { method: 'POST' });
-            document.getElementById('chat-box').innerHTML = `
-                <div class="message-wrapper" style="align-items: flex-start;">
-                    <div class="message ai">ચેટ હિસ્ટ્રી ક્લીન થઈ ગઈ છે ભાઈ! નવો પ્રશ્ન પૂછો. 🚀</div>
-                </div>`;
         }
     </script>
 </body>
