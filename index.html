@@ -1,214 +1,381 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>miten.ai</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>miten.ai | Premium Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
-            --bg-main: #212121; --bg-sidebar: #171717; --text-color: #ececec;
-            --chat-user: #2f2f2f; --chat-ai: transparent; --border-color: rgba(255,255,255,0.08);
-            --accent: #10a37f; --input-bg: #2f2f2f;
+            --bg-dark: #09090b; --bg-sidebar: #121214; --accent-glow: #10a37f;
+            --panel-bg: #1c1c1f; --text-light: #f4f4f5; --border: rgba(255,255,255,0.06);
         }
-        .light-theme {
-            --bg-main: #ffffff; --bg-sidebar: #f9f9f9; --text-color: #0d0d0d;
-            --chat-user: #f4f4f4; --chat-ai: transparent; --border-color: rgba(0,0,0,0.08);
-            --accent: #10a37f; --input-bg: #f4f4f4;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; transition: background 0.3s, color 0.3s; }
+        body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; display: flex; overflow: hidden; }
+
+        /* Glowing Background Animation */
+        body::before {
+            content: ''; position: absolute; width: 300px; height: 300px; background: rgba(16, 163, 127, 0.08);
+            filter: blur(120px); top: 10%; left: 25%; border-radius: 50%; z-index: 0; pointer-events: none;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s, color 0.3s; }
-        body { background: var(--bg-main); height: 100vh; display: flex; color: var(--text-color); overflow: hidden; }
+
+        /* Sidebar UI */
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; z-index: 10; justify-content: space-between; }
+        .side-top-nav { display: flex; flex-direction: column; gap: 12px; }
         
-        /* Sidebar Styles */
-        .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 12px; }
-        .new-chat-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .new-chat-btn:hover { background: rgba(255,255,255,0.05); }
-        .light-theme .new-chat-btn:hover { background: rgba(0,0,0,0.05); }
-        .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .history-item { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-item:hover { background: rgba(255,255,255,0.05); }
-        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; margin-top: auto; }
-
-        /* Main Chat Area */
-        .chat-area { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
-        .top-bar { padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-        .top-bar h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+        /* Fixed Background Clip Here */
+        .logo-title { 
+            font-size: 22px; 
+            font-weight: 700; 
+            background: linear-gradient(45deg, #10a37f, #00d2ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            padding-left: 6px; 
+            margin-bottom: 10px; 
+        }
         
-        /* Welcome Screen */
-        .welcome-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
-        .welcome-container h1 { font-size: 32px; font-weight: 600; margin-bottom: 40px; }
-        .suggestions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; width: 100%; }
-        .suggestion-card { background: var(--input-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; cursor: pointer; text-align: left; font-size: 14px; }
-        .suggestion-card:hover { filter: brightness(1.1); }
+        .btn-new-chat { background: linear-gradient(135deg, #10a37f, #0d8567); border: none; color: #fff; padding: 12px; border-radius: 12px; font-weight: 500; cursor: pointer; text-align: center; font-size: 14px; box-shadow: 0 4px 12px rgba(16,163,127,0.2); }
+        
+        .history-section { margin-top: 15px; flex: 1; overflow-y: auto; }
+        .history-title { font-size: 11px; text-transform: uppercase; color: #52525b; font-weight: 600; margin-bottom: 8px; padding-left: 6px; }
+        .topic-list { display: flex; flex-direction: column; gap: 4px; }
+        .topic-item { padding: 10px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: transparent; }
+        .topic-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .topic-item.active { background: rgba(16, 163, 127, 0.15); color: #10a37f; border-left: 3px solid #10a37f; }
 
-        /* Chat Messages */
-        #messages-container { flex: 1; overflow-y: auto; padding: 40px 20%; display: none; flex-direction: column; gap: 24px; }
-        .msg-row { display: flex; width: 100%; flex-direction: column; }
-        .msg-row.user-row { align-items: flex-end; }
-        .msg-row.ai-row { align-items: flex-start; }
-        .bubble { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px; word-wrap: break-word; }
-        .bubble.user-bubble { background: var(--chat-user); color: var(--text-color); }
-        .bubble.ai-bubble { background: var(--chat-ai); color: var(--text-color); }
-        .bubble strong { color: var(--accent); }
-        .actions-bar { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; opacity: 0.6; padding-left: 6px; }
-        .action-btn { cursor: pointer; background: none; border: none; color: var(--text-color); }
+        /* Pricing & Account Section Inside Sidebar */
+        .side-bottom-nav { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .nav-card-btn { background: var(--panel-bg); border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; text-align: left; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+        .nav-card-btn:hover { background: #27272a; border-color: #10a37f; }
 
-        /* Input Area */
-        .input-container { padding: 20px 20% 30px 20%; background: linear-gradient(transparent, var(--bg-main) 20%); }
-        .input-box-wrapper { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; padding: 8px 16px; gap: 10px; }
-        input { flex: 1; background: transparent; border: none; color: var(--text-color); padding: 10px 4px; font-size: 16px; outline: none; }
-        .icon-btn { background: transparent; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; padding: 6px; opacity: 0.7; }
-        .icon-btn:hover { opacity: 1; }
-        .send-btn { background: var(--text-color); color: var(--bg-main); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
-        .typing-indicator { font-size: 13px; color: var(--accent); margin-left: 20%; margin-bottom: 5px; display: none; }
+        /* Main Workspace */
+        .workspace { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 5; }
+        
+        /* Welcome Display */
+        .welcome-hub { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
+        .welcome-hub h1 { font-size: 34px; font-weight: 600; margin-bottom: 30px; letter-spacing: -0.5px; animation: fadeInDown 0.6s ease; }
+        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 640px; width: 100%; animation: fadeInUp 0.8s ease; }
+        .panel-card { background: var(--panel-bg); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; text-align: left; font-size: 14px; transition: transform 0.2s, border-color 0.2s; }
+        .panel-card:hover { transform: translateY(-3px); border-color: var(--accent-glow); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+
+        /* Message Streaming Container */
+        .conversation-flow { flex: 1; overflow-y: auto; padding: 40px 18%; display: none; flex-direction: column; gap: 28px; }
+        .block-row { display: flex; width: 100%; flex-direction: column; }
+        .block-row.user-block { align-items: flex-end; }
+        .block-row.ai-block { align-items: flex-start; }
+        .bubble-chat { max-width: 85%; padding: 14px 20px; border-radius: 20px; font-size: 15px; line-height: 1.65; word-wrap: break-word; }
+        .bubble-chat.user-bubble { background: #27272a; color: var(--text-light); border-bottom-right-radius: 4px; }
+        .bubble-chat.ai-bubble { background: transparent; color: #e4e4e7; }
+        .preview-img-msg { max-width: 200px; border-radius: 12px; margin-bottom: 8px; display: block; border: 1px solid var(--border); }
+        .bubble-chat h3, .bubble-chat strong { color: var(--accent-glow); margin-top: 5px; display: inline-block; }
+        .item-utility { display: flex; gap: 14px; margin-top: 8px; font-size: 12px; opacity: 0.5; padding-left: 4px; }
+        .util-link { cursor: pointer; background: none; border: none; color: #fff; }
+        .util-link:hover { color: var(--accent-glow); opacity: 1; }
+
+        /* Input Console */
+        .console-container { padding: 10px 18% 30px 18%; background: linear-gradient(transparent, var(--bg-dark) 30%); }
+        .console-bar { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 30px; display: flex; align-items: center; padding: 10px 20px; gap: 12px; position: relative; }
+        .console-bar input { flex: 1; background: transparent; border: none; color: #fff; font-size: 15px; outline: none; }
+        
+        /* Media Preview Element */
+        .upload-preview-area { position: absolute; top: -75px; left: 20px; background: var(--panel-bg); border: 1px solid var(--accent-glow); padding: 6px; border-radius: 10px; display: none; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .upload-preview-area img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
+        .close-preview { cursor: pointer; color: #ef4444; font-weight: bold; font-size: 14px; }
+
+        /* Circular Send / Actions Buttons */
+        .round-btn { background: transparent; border: none; color: #a1a1aa; cursor: pointer; font-size: 18px; padding: 6px; display: flex; align-items: center; justify-content: center; }
+        .round-btn:hover { color: #fff; }
+        .btn-submit { background: #fff; color: #000; border-radius: 50%; width: 34px; height: 34px; font-weight: bold; font-size: 16px; margin-left: 5px; display: flex; align-items: center; justify-content: center; }
+        .btn-submit:hover { transform: scale(1.05); background: var(--accent-glow); color: #fff; }
+        
+        .pulse-loader { font-size: 13px; color: var(--accent-glow); margin-left: 18%; margin-bottom: 8px; display: none; font-weight: 500; }
+
+        /* Premium Plan Modal Overlays */
+        .modal-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; justify-content: center; align-items: center; }
+        .modal-box { background: var(--bg-sidebar); border: 1px solid var(--border); padding: 32px; border-radius: 24px; max-width: 750px; width: 100%; text-align: center; position: relative; }
+        .plans-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 25px; }
+        .plan-card { background: var(--panel-bg); border: 1px solid var(--border); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .plan-card.pro { border-color: var(--accent-glow); }
+        .plan-card h3 { font-size: 18px; margin-bottom: 8px; }
+        .plan-price { font-size: 24px; font-weight: 700; color: #fff; margin: 10px 0; }
+        .plan-features { font-size: 12px; color: #a1a1aa; text-align: left; list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .plan-btn { background: rgba(255,255,255,0.08); border: none; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .plan-card.pro .plan-btn { background: var(--accent-glow); }
+        .close-modal-btn { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; color: #a1a1aa; }
+
+        /* Account Status Mock Widget */
+        .account-widget { background: var(--panel-bg); display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; border: 1px solid var(--border); margin-top: 5px; }
+        .avatar { width: 32px; height: 32px; background: var(--accent-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; color: #fff; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
+    <!-- SIDEBAR INTERFACE -->
     <div class="sidebar">
-        <button class="new-chat-btn" onclick="startNewChat()">New chat <span>+</span></button>
-        <div class="history-list" id="history-box"></div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌗 Change Theme</button>
-    </div>
-
-    <!-- Main Chat Content -->
-    <div class="chat-area">
-        <div class="top-bar">
-            <h2>miten.ai</h2>
-        </div>
-
-        <!-- Welcome View -->
-        <div class="welcome-container" id="welcome-screen">
-            <h1>What can I help with today?</h1>
-            <div class="suggestions-grid">
-                <div class="suggestion-card" onclick="useSuggestion('મને મસ્ત કોડિંગ શીખવાડ ભાઈ!')">💡 Learn Coding <br><span style="opacity:0.6;font-size:12px;">મને મસ્ત કોડિંગ શીખવાડ ભાઈ!</span></div>
-                <div class="suggestion-card" onclick="useSuggestion('ઇન્સ્ટાગ્રામ રીલ માટે મસ્ત કેપ્શન લખી આપ')">✍️ Write a Caption <br><span style="opacity:0.6;font-size:12px;">ઇન્સ્ટાગ્રામ રીલ માટે મસ્ત કેપ્શન લખી આપ</span></div>
-                <div class="suggestion-card" onclick="useSuggestion('તારા વિશે કઈક ખાસ જણાવ')">🤖 About miten.ai <br><span style="opacity:0.6;font-size:12px;">તારા વિશે કઈક ખાસ જણાવ</span></div>
-                <div class="suggestion-card" onclick="useSuggestion('આજે કોઈ કૂલ ગુજરાતી શાયરી સંભળાવ')">🎭 Entertainment <br><span style="opacity:0.6;font-size:12px;">આજે કોઈ કૂલ ગુજરાતી શાયરી સંભળાવ</span></div>
+        <div class="side-top-nav">
+            <div class="logo-title">miten.ai</div>
+            <button class="btn-new-chat" onclick="createNewSession()">+ New Chat</button>
+            
+            <div class="history-section">
+                <div class="history-title">Recent Conversations</div>
+                <div class="topic-list" id="topic-box-view"></div>
             </div>
         </div>
 
-        <!-- Actual Chat Messages View -->
-        <div id="messages-container"></div>
-        <div class="typing-indicator" id="loader">miten.ai is typing...</div>
+        <div class="side-bottom-nav">
+            <button class="nav-card-btn" onclick="openPlansModal()">💎 View Premium Plans <span>➔</span></button>
+            <div class="account-widget" id="user-status-area">
+                <div class="avatar">M</div>
+                <div style="text-align: left;">
+                    <div style="font-size:13px;font-weight:600;" id="lbl-username">Miten Patel</div>
+                    <div style="font-size:11px;color:#22c55e;" id="lbl-plan">Free Plan</div>
+                </div>
+                <button style="margin-left:auto; background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer;" onclick="mockSignOut()">SignOut</button>
+            </div>
+            <button class="nav-card-btn" id="btn-mock-signin" style="display: none; justify-content: center; background: #10a37f;" onclick="mockSignIn()">Sign In with Google</button>
+        </div>
+    </div>
 
-        <!-- Input Area -->
-        <div class="input-container">
-            <div class="input-box-wrapper">
-                <button class="icon-btn" onclick="startVoiceInput()" title="Voice Input">🎙️</button>
-                <input type="text" id="user-msg-input" placeholder="Message miten.ai..." onkeypress="if(event.key === 'Enter') handleSend()">
-                <button class="icon-btn send-btn" onclick="handleSend()">↑</button>
+    <!-- MAIN ENGINE WORKSPACE -->
+    <div class="workspace">
+        <!-- WELCOME LANDING -->
+        <div class="welcome-hub" id="home-dashboard">
+            <h1>What can I help with today?</h1>
+            <div class="cards-grid">
+                <div class="panel-card" onclick="triggerDefaultField('દુનિયાના 7 અજાયબીઓનું લિસ્ટ આપો')">🌐 Knowledge Base<br><span style="opacity:0.5; font-size:12px;">દુનિયાના 7 અજાયબીઓનું લિસ્ટ આપો</span></div>
+                <div class="panel-card" onclick="triggerDefaultField('Write a professional email template for leave request')">📧 Email Writer<br><span style="opacity:0.5; font-size:12px;">Write a professional email template for leave request</span></div>
+                <div class="panel-card" onclick="triggerDefaultField('એક સરસ મોટીવેશનલ વાર્તા કહો')">📚 Story Telling<br><span style="opacity:0.5; font-size:12px;">એક સરસ મોટીવેશનલ વાર્તા કહો</span></div>
+                <div class="panel-card" onclick="triggerDefaultField('Explain Quantum Computing in simple terms')">🔬 Tech Master<br><span style="opacity:0.5; font-size:12px;">Explain Quantum Computing in simple terms</span></div>
+            </div>
+        </div>
+
+        <!-- CONVERSATION VIEWER -->
+        <div class="conversation-flow" id="chat-viewport"></div>
+        <div class="pulse-loader" id="sys-loader">miten.ai is thinking...</div>
+
+        <!-- CONSOLE INPUT COMPONENT -->
+        <div class="console-container">
+            <div class="console-bar">
+                <div class="upload-preview-area" id="img-preview-box">
+                    <img src="" id="target-preview-img">
+                    <span class="close-preview" onclick="clearImageSelection()">✕</span>
+                </div>
+
+                <label class="round-btn" title="Upload Image" style="cursor: pointer;">
+                    📷 <input type="file" id="media-file-input" accept="image/*" style="display:none;" onchange="previewSelectedImage(this)">
+                </label>
+                <button class="round-btn" onclick="triggerMicSystem()" id="mic-status-icon" title="Voice Input">🎙️</button>
+                <input type="text" id="main-user-input" placeholder="Ask miten.ai anything..." onkeypress="if(event.key==='Enter') executeSendFlow()">
+                <button class="round-btn btn-submit" onclick="executeSendFlow()">↑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM PLANS MODAL VIEW -->
+    <div class="modal-view" id="pricing-modal">
+        <div class="modal-box">
+            <span class="close-modal-btn" onclick="closePlansModal()">✕</span>
+            <h2>Upgrade Your Intelligence Experience</h2>
+            <p style="color:#a1a1aa; font-size:14px; margin-top:5px;">Unlock the full power of advanced multimodal AI architecture.</p>
+            
+            <div class="plans-row">
+                <div class="plan-card">
+                    <div>
+                        <h3>Free Tier</h3>
+                        <div class="plan-price">$0</div>
+                        <ul class="plan-features">
+                            <li>✓ Access to basic Flash Engine</li>
+                            <li>✓ 50 messages per day maximum</li>
+                            <li>✓ Standard processing latency</li>
+                        </ul>
+                    </div>
+                    <button class="plan-btn" onclick="selectPlan('Free Plan')">Current Active</button>
+                </div>
+                <div class="plan-card pro">
+                    <div style="position:absolute; top:-10px; right:15px; background:#10a37f; font-size:10px; padding:3px 8px; border-radius:20px; font-weight:700;">POPULAR</div>
+                    <div>
+                        <h3>Plus Pro</h3>
+                        <div class="plan-price">$20<span style="font-size:12px;color:#a1a1aa;">/mo</span></div>
+                        <ul class="plan-features">
+                            <li>✓ Unlimited interactions architecture</li>
+                            <li>✓ Advanced Multimodal (Image + Text)</li>
+                            <li>✓ 3x faster server response rate</li>
+                        </ul>
+                    </div>
+                    <button class="plan-btn" onclick="selectPlan('Pro Plus ($20)')">Upgrade Now</button>
+                </div>
+                <div class="plan-card">
+                    <div>
+                        <h3>Enterprise Max</h3>
+                        <div class="plan-price">$40<span style="font-size:12px;color:#a1a1aa;">/mo</span></div>
+                        <ul class="plan-features">
+                            <li>✓ Full API node dedicated server</li>
+                            <li>✓ Max speed contextual mapping</li>
+                            <li>✓ Dedicated technical customer support</li>
+                        </ul>
+                    </div>
+                    <button class="plan-btn" onclick="selectPlan('Enterprise Max ($40)')">Purchase Custom</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let chatHistory = [];
+        let currentSessionHistory = [];
+        let activeSessionId = null;
+        let base64SelectedImage = null;
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-theme');
-        }
-
-        function useSuggestion(text) {
-            document.getElementById('user-msg-input').value = text;
-            handleSend();
-        }
-
-        // સ્પીચ-ટુ-ટેક્સ્ટ (માઇક ફીચર)
-        function startVoiceInput() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("તમારા બ્રાઉઝરમાં વોઈસ ટાઈપિંગ સપોર્ટ નથી ભાઈ!");
-                return;
-            }
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'gu-IN'; 
-            recognition.start();
-            document.getElementById('user-msg-input').placeholder = "હું સાંભળું છું, બોલો ભાઈ...";
-            
-            recognition.onresult = function(event) {
-                const resultText = event.results[0][0].transcript;
-                document.getElementById('user-msg-input').value = resultText;
-                document.getElementById('user-msg-input').placeholder = "Message miten.ai...";
-            };
-        }
-
-        function startNewChat() {
-            fetch('/api/clear', { method: 'POST' });
-            document.getElementById('messages-container').innerHTML = '';
-            document.getElementById('messages-container').style.display = 'none';
-            document.getElementById('welcome-screen').style.display = 'flex';
-        }
-
-        function copyBox(btn, text) {
-            navigator.clipboard.writeText(text.replace(/<\/?[^>]+(>|$)/g, ""));
-            btn.textContent = "Copied!";
-            setTimeout(() => btn.textContent = "Copy 📋", 2000);
-        }
-
-        function speakBox(text) {
+        function stopAudioEngine() {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text.replace(/<\/?[^>]+(>|$)/g, ""));
-            utterance.lang = 'gu-IN';
-            window.speechSynthesis.speak(utterance);
         }
 
-        async function handleSend() {
-            const input = document.getElementById('user-msg-input');
-            const text = input.value.trim();
-            if (!text) return;
+        function triggerDefaultField(val) {
+            document.getElementById('main-user-input').value = val;
+            executeSendFlow();
+        }
 
-            // સાઇડબાર હિસ્ટ્રી મેનેજમેન્ટ
-            if (chatHistory.indexOf(text) === -1) {
-                chatHistory.push(text);
-                const hBox = document.getElementById('history-box');
-                hBox.innerHTML += `<div class="history-item" onclick="document.getElementById('user-msg-input').value='${text}'; handleSend();">💬 ${text}</div>`;
+        function previewSelectedImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64SelectedImage = e.target.result;
+                    document.getElementById('target-preview-img').src = base64SelectedImage;
+                    document.getElementById('img-preview-box').style.display = 'flex';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImageSelection() {
+            base64SelectedImage = null;
+            document.getElementById('media-file-input').value = '';
+            document.getElementById('img-preview-box').style.display = 'none';
+        }
+
+        function triggerMicSystem() {
+            stopAudioEngine();
+            const SpeechObj = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechObj) { alert("Mic input not supported on this browser context."); return; }
+            
+            const mic = new SpeechObj();
+            mic.lang = 'gu-IN';
+            mic.start();
+            
+            const field = document.getElementById('main-user-input');
+            field.placeholder = "Listening actively...";
+            
+            mic.onresult = function(e) {
+                field.value = e.results[0][0].transcript;
+                field.placeholder = "Ask miten.ai anything...";
+            }
+        }
+
+        function createNewSession() {
+            stopAudioEngine();
+            fetch('/api/clear', { method: 'POST' });
+            currentSessionHistory = [];
+            activeSessionId = null;
+            clearImageSelection();
+            document.getElementById('chat-viewport').innerHTML = '';
+            document.getElementById('chat-viewport').style.display = 'none';
+            document.getElementById('home-dashboard').style.display = 'flex';
+        }
+
+        async function executeSendFlow() {
+            stopAudioEngine();
+            const inputField = document.getElementById('main-user-input');
+            const promptText = inputField.value.trim();
+            
+            if(!promptText && !base64SelectedImage) return;
+
+            document.getElementById('home-dashboard').style.display = 'none';
+            const screen = document.getElementById('chat-viewport');
+            screen.style.display = 'flex';
+
+            let userContentHTML = `<div class="bubble-chat user-bubble">`;
+            if (base64SelectedImage) {
+                userContentHTML += `<img src="${base64SelectedImage}" class="preview-img-msg" />`;
+            }
+            if (promptText) {
+                userContentHTML += `<p>${promptText}</p>`;
+            }
+            userContentHTML += `</div>`;
+
+            screen.innerHTML += `<div class="block-row user-block">${userContentHTML}</div>`;
+            screen.scrollTop = screen.scrollHeight;
+            
+            inputField.value = '';
+            document.getElementById('sys-loader').style.display = 'block';
+
+            if(!activeSessionId && promptText) {
+                activeSessionId = 'session_' + Date.now();
+                const box = document.getElementById('topic-box-view');
+                box.innerHTML = `<div class="topic-item active" id="${activeSessionId}">💬 ${promptText}</div>` + box.innerHTML;
             }
 
-            document.getElementById('welcome-screen').style.display = 'none';
-            const container = document.getElementById('messages-container');
-            container.style.display = 'flex';
-
-            // યુઝર મેસેજ
-            container.innerHTML += `
-                <div class="msg-row user-row">
-                    <div class="bubble user-bubble">${text}</div>
-                </div>`;
-            
-            input.value = '';
-            container.scrollTop = container.scrollHeight;
-            document.getElementById('loader').style.display = 'block';
+            const payloadImage = base64SelectedImage;
+            clearImageSelection();
 
             try {
-                const response = await fetch('/api/chat', {
+                const call = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        message: promptText,
+                        history: currentSessionHistory,
+                        image: payloadImage
+                    })
                 });
-                const data = await response.json();
-                document.getElementById('loader').style.display = 'none';
+                
+                const data = await call.json();
+                document.getElementById('sys-loader').style.display = 'none';
 
-                const parsedHTML = marked.parse(data.reply);
-                const escapedText = data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${');
+                const htmlFormatted = marked.parse(data.reply);
+                const stringifiedClean = data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${');
 
-                container.innerHTML += `
-                    <div class="msg-row ai-row">
-                        <div class="bubble ai-bubble">${parsedHTML}</div>
-                        <div class="actions-bar">
-                            <button class="action-btn" onclick="copyBox(this, \`${escapedText}\`)">Copy 📋</button>
-                            <button class="action-btn" onclick="speakBox(\`${escapedText}\`)">Speak 🔊</button>
+                screen.innerHTML += `
+                    <div class="block-row ai-block">
+                        <div class="bubble-chat ai-bubble">${htmlFormatted}</div>
+                        <div class="item-utility">
+                            <button class="util-link" onclick="navigator.clipboard.writeText(\`${stringifiedClean}\`); this.innerText='Copied!';">Copy 📋</button>
+                            <button class="util-link" onclick="stopAudioEngine(); const u=new SpeechSynthesisUtterance(\`${stringifiedClean}\`); window.speechSynthesis.speak(u);">Speak 🔊</button>
                         </div>
                     </div>`;
-                
-                speakBox(data.reply);
-                container.scrollTop = container.scrollHeight;
 
-            } catch (e) {
-                document.getElementById('loader').style.display = 'none';
-                container.innerHTML += `<div class="msg-row ai-row"><div class="bubble ai-bubble" style="color:#ff4a4a;">સર્વરમાં કોઈ ખામી આવી ભાઈ! 🛠️</div></div>`;
+                currentSessionHistory.push({ role: 'user', text: promptText || "Sent an image" });
+                currentSessionHistory.push({ role: 'ai', text: data.reply });
+
+                screen.scrollTop = screen.scrollHeight;
+
+            } catch (err) {
+                document.getElementById('sys-loader').style.display = 'none';
+                screen.innerHTML += `<div class="block-row ai-block"><div class="bubble-chat ai-bubble" style="color:#ef4444;">Network anomaly discovered. Reset console endpoint.</div></div>`;
             }
+        }
+
+        function mockSignOut() {
+            document.getElementById('user-status-area').style.display = 'none';
+            document.getElementById('btn-mock-signin').style.display = 'flex';
+        }
+        function mockSignIn() {
+            document.getElementById('btn-mock-signin').style.display = 'none';
+            document.getElementById('user-status-area').style.display = 'flex';
+            document.getElementById('lbl-username').innerText = "Verified User";
+            document.getElementById('lbl-plan').innerText = "Free Plan";
+        }
+
+        function openPlansModal() { document.getElementById('pricing-modal').style.display = 'flex'; }
+        function closePlansModal() { document.getElementById('pricing-modal').style.display = 'none'; }
+        function selectPlan(planName) {
+            document.getElementById('lbl-plan').innerText = planName;
+            alert(`Miten.ai Protocol: Successfully activated ${planName}!`);
+            closePlansModal();
         }
     </script>
 </body>
