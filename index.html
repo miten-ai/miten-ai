@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miten.ai | Ultimate Super AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: radial-gradient(circle at top right, #1a1a2e, #09090e); height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; }
+        .chat-container { width: 100%; max-width: 850px; height: 88vh; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.6); margin: 20px; }
+        .chat-header { padding: 20px 24px; background: rgba(255, 255, 255, 0.01); border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: space-between; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-dot { width: 12px; height: 12px; background: #00ffaa; border-radius: 50%; box-shadow: 0 0 12px #00ffaa; }
+        .chat-header h1 { font-size: 22px; font-weight: 600; background: linear-gradient(45deg, #00ffaa, #00bfff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .controls { display: flex; gap: 10px; }
+        .btn-clear { background: rgba(255, 74, 74, 0.1); border: 1px solid rgba(255, 74, 74, 0.3); color: #ff4a4a; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-clear:hover { background: #ff4a4a; color: #fff; }
+        #chat-box { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+        .message-wrapper { display: flex; flex-direction: column; width: 100%; }
+        .message { padding: 14px 20px; border-radius: 18px; max-width: 75%; line-height: 1.6; font-size: 15px; position: relative; word-wrap: break-word; }
+        .user { background: linear-gradient(135deg, #0052d4, #4364f7); color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(67, 100, 247, 0.25); }
+        .ai { background: rgba(255, 255, 255, 0.05); color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.04); }
+        .ai p { margin-bottom: 8px; } .ai p:last-child { margin-bottom: 0; }
+        .ai strong { color: #00ffaa; }
+        .msg-tools { display: flex; gap: 10px; margin-top: 6px; font-size: 12px; color: #888; }
+        .tool-btn { cursor: pointer; background: none; border: none; color: #a0a0b8; font-size: 12px; box-shadow: none; padding: 0; }
+        .tool-btn:hover { color: #fff; }
+        #input-area { padding: 20px 24px; background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; gap: 12px; align-items: center; }
+        input { flex: 1; padding: 16px 20px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; color: white; font-size: 15px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #00ffaa; background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 15px rgba(0, 255, 170, 0.1); }
+        button { padding: 16px 32px; background: linear-gradient(45deg, #00ffaa, #00bfff); color: #09090e; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 15px; transition: 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 170, 0.3); }
+        .typing { color: #00ffaa; font-size: 13px; margin-left: 24px; margin-bottom: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="logo-area">
+                <div class="logo-dot"></div>
+                <h1>miten.ai</h1>
+            </div>
+            <div class="controls">
+                <button class="btn-clear" onclick="clearMemory()">નવી ચેટ (Clear)</button>
+            </div>
+        </div>
+        
+        <div id="chat-box">
+            <div class="message-wrapper" style="align-items: flex-start;">
+                <div class="message ai">હેલો ભાઈ! હું Miten.ai છું. હવે હું લાઈવ થવા માટે એકદમ રેડી છું. કંઈપણ પૂછો! 🔥</div>
+            </div>
+        </div>
+
+        <div class="typing" id="typing-loader">Miten.ai વિચારી રહ્યું છે...</div>
+
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="અહીં કંઈપણ સ્માર્ટ પૂછો..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">પૂછો</button>
+        </div>
+    </div>
+
+    <script>
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'gu-IN';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function copyText(btn, text) {
+            const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
+            navigator.clipboard.writeText(cleanText);
+            btn.textContent = "Copied! ✓";
+            setTimeout(() => btn.textContent = "Copy 📋", 2000);
+        }
+
+        function typeEffect(element, htmlContent, rawText) {
+            element.innerHTML = htmlContent;
+            speak(rawText);
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const loader = document.getElementById('typing-loader');
+            const messageText = inputField.value.trim();
+
+            if (!messageText) return;
+
+            chatBox.innerHTML += `
+                <div class="message-wrapper" style="align-items: flex-end;">
+                    <div class="message user">${messageText}</div>
+                </div>`;
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            loader.style.display = 'block';
+
+            try {
+                // અહીંથી localhost કાઢી નાખ્યું છે જેથી ઓનલાઇન લિંક પર આ સીધું ચાલે
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageText })
+                });
+                const data = await response.json();
+                loader.style.display = 'none';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'message-wrapper';
+                wrapper.style.alignItems = 'flex-start';
+
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'message ai';
+                
+                const toolsDiv = document.createElement('div');
+                toolsDiv.className = 'msg-tools';
+                
+                wrapper.appendChild(aiDiv);
+                wrapper.appendChild(toolsDiv);
+                chatBox.appendChild(wrapper);
+
+                const parsedHTML = marked.parse(data.reply);
+                typeEffect(aiDiv, parsedHTML, data.reply);
+
+                toolsDiv.innerHTML = `
+                    <button class="tool-btn" onclick="copyText(this, \`${data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${')}\`)">Copy 📋</button>
+                    <button class="tool-btn" onclick="speak(\`${data.reply.replace(/`/g, '\\`').replace(/\${/g, '\\${')}\`)">Speak 🔊</button>
+                `;
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch (error) {
+                loader.style.display = 'none';
+                chatBox.innerHTML += `<div class="message ai" style="color:#ff4a4a;">ભૂલ: કનેક્શન તૂટી ગયું.</div>`;
+            }
+        }
+
+        async function clearMemory() {
+            await fetch('/api/clear', { method: 'POST' });
+            document.getElementById('chat-box').innerHTML = `
+                <div class="message-wrapper" style="align-items: flex-start;">
+                    <div class="message ai">ચેટ હિસ્ટ્રી ક્લીન થઈ ગઈ છે ભાઈ! નવો પ્રશ્ન પૂછો. 🚀</div>
+                </div>`;
+        }
+    </script>
+</body>
+</html>
