@@ -12,7 +12,7 @@
             --panel-bg: #1c1c1f; --text-light: #f4f4f5; --border: rgba(255,255,255,0.06);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; transition: background 0.3s, color 0.3s; }
-        body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; display: flex; overflow: hidden; }
+        body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; display: flex; overflow: hidden; position: relative; }
 
         /* Glowing Background Animation */
         body::before {
@@ -20,22 +20,14 @@
             filter: blur(120px); top: 10%; left: 25%; border-radius: 50%; z-index: 0; pointer-events: none;
         }
 
-        /* Sidebar UI */
-        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; z-index: 10; justify-content: space-between; }
+        /* Sidebar UI with Mobile Toggling support */
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; z-index: 100; justify-content: space-between; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .side-top-nav { display: flex; flex-direction: column; gap: 12px; }
         
-        /* Fixed Background Clip Here */
-        .logo-title { 
-            font-size: 22px; 
-            font-weight: 700; 
-            background: linear-gradient(45deg, #10a37f, #00d2ff); 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            padding-left: 6px; 
-            margin-bottom: 10px; 
-        }
-        
+        .logo-section { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .logo-title { font-size: 22px; font-weight: 700; background: linear-gradient(45deg, #10a37f, #00d2ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; padding-left: 6px; }
+        .close-sidebar-btn { display: none; background: transparent; border: none; color: #a1a1aa; font-size: 20px; cursor: pointer; }
+
         .btn-new-chat { background: linear-gradient(135deg, #10a37f, #0d8567); border: none; color: #fff; padding: 12px; border-radius: 12px; font-weight: 500; cursor: pointer; text-align: center; font-size: 14px; box-shadow: 0 4px 12px rgba(16,163,127,0.2); }
         
         .history-section { margin-top: 15px; flex: 1; overflow-y: auto; }
@@ -51,17 +43,22 @@
         .nav-card-btn:hover { background: #27272a; border-color: #10a37f; }
 
         /* Main Workspace */
-        .workspace { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 5; }
+        .workspace { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 5; width: 100%; }
         
+        /* Top Navigation Header for Mobile App Layout */
+        .mobile-header { display: flex; align-items: center; padding: 12px 20px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); z-index: 10; }
+        .menu-toggle-btn { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; margin-right: 15px; display: none; }
+        .mobile-header h2 { font-size: 18px; font-weight: 600; }
+
         /* Welcome Display */
-        .welcome-hub { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
-        .welcome-hub h1 { font-size: 34px; font-weight: 600; margin-bottom: 30px; letter-spacing: -0.5px; animation: fadeInDown 0.6s ease; }
+        .welcome-hub { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; overflow-y: auto; }
+        .welcome-hub h1 { font-size: 30px; font-weight: 600; margin-bottom: 30px; letter-spacing: -0.5px; animation: fadeInDown 0.6s ease; }
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 640px; width: 100%; animation: fadeInUp 0.8s ease; }
         .panel-card { background: var(--panel-bg); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; text-align: left; font-size: 14px; transition: transform 0.2s, border-color 0.2s; }
         .panel-card:hover { transform: translateY(-3px); border-color: var(--accent-glow); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
 
         /* Message Streaming Container */
-        .conversation-flow { flex: 1; overflow-y: auto; padding: 40px 18%; display: none; flex-direction: column; gap: 28px; }
+        .conversation-flow { flex: 1; overflow-y: auto; padding: 30px 18%; display: none; flex-direction: column; gap: 28px; }
         .block-row { display: flex; width: 100%; flex-direction: column; }
         .block-row.user-block { align-items: flex-end; }
         .block-row.ai-block { align-items: flex-start; }
@@ -84,7 +81,7 @@
         .upload-preview-area img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
         .close-preview { cursor: pointer; color: #ef4444; font-weight: bold; font-size: 14px; }
 
-        /* Circular Send / Actions Buttons */
+        /* Circular Buttons */
         .round-btn { background: transparent; border: none; color: #a1a1aa; cursor: pointer; font-size: 18px; padding: 6px; display: flex; align-items: center; justify-content: center; }
         .round-btn:hover { color: #fff; }
         .btn-submit { background: #fff; color: #000; border-radius: 50%; width: 34px; height: 34px; font-weight: bold; font-size: 16px; margin-left: 5px; display: flex; align-items: center; justify-content: center; }
@@ -92,9 +89,9 @@
         
         .pulse-loader { font-size: 13px; color: var(--accent-glow); margin-left: 18%; margin-bottom: 8px; display: none; font-weight: 500; }
 
-        /* Premium Plan Modal Overlays */
-        .modal-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; justify-content: center; align-items: center; }
-        .modal-box { background: var(--bg-sidebar); border: 1px solid var(--border); padding: 32px; border-radius: 24px; max-width: 750px; width: 100%; text-align: center; position: relative; }
+        /* Premium & Auth Overlays */
+        .modal-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 500; justify-content: center; align-items: center; padding: 15px; }
+        .modal-box { background: var(--bg-sidebar); border: 1px solid var(--border); padding: 32px; border-radius: 24px; max-width: 750px; width: 100%; text-align: center; position: relative; max-height: 90vh; overflow-y: auto; }
         .plans-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 25px; }
         .plan-card { background: var(--panel-bg); border: 1px solid var(--border); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .plan-card.pro { border-color: var(--accent-glow); }
@@ -105,21 +102,53 @@
         .plan-card.pro .plan-btn { background: var(--accent-glow); }
         .close-modal-btn { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; color: #a1a1aa; }
 
+        /* Natural Gateway UI styling */
+        .gateway-box { background: #1c1c1f; border-radius: 16px; border: 1px solid var(--border); max-width: 400px; width: 100%; padding: 24px; text-align: left; position: relative; color: #fff; }
+        .gateway-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .gateway-form-group { margin-bottom: 15px; }
+        .gateway-form-group label { display: block; font-size: 12px; color: #a1a1aa; margin-bottom: 5px; }
+        .gateway-form-group input { width: 100%; padding: 10px; border-radius: 8px; background: #27272a; border: 1px solid var(--border); color: #fff; outline: none; font-size: 14px; }
+        .gateway-btn { width: 100%; background: #10a37f; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; text-align: center; }
+        
+        /* Spinner Loader */
+        .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #10a37f; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+
         /* Account Status Mock Widget */
         .account-widget { background: var(--panel-bg); display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; border: 1px solid var(--border); margin-top: 5px; }
         .avatar { width: 32px; height: 32px; background: var(--accent-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; color: #fff; }
+        
+        /* Sidebar Overlay Background for Mobile */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 90; }
 
+        @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MOBILE APP OPTIMIZATION MEDIA QUERIES */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .close-sidebar-btn, .menu-toggle-btn { display: block; }
+            .conversation-flow { padding: 20px 5%; }
+            .console-container { padding: 10px 5% 20px 5%; }
+            .welcome-hub h1 { font-size: 24px; }
+            .cards-grid { grid-template-columns: 1fr; gap: 10px; }
+            .plans-row { grid-template-columns: 1fr; }
+            .modal-box { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR INTERFACE -->
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebar-overlay-mask" onclick="toggleSidebarMenu(false)"></div>
+
+    <div class="sidebar" id="app-sidebar-node">
         <div class="side-top-nav">
-            <div class="logo-title">miten.ai</div>
-            <button class="btn-new-chat" onclick="createNewSession()">+ New Chat</button>
+            <div class="logo-section">
+                <div class="logo-title">miten.ai</div>
+                <button class="close-sidebar-btn" onclick="toggleSidebarMenu(false)">✕</button>
+            </div>
+            <button class="btn-new-chat" onclick="createNewSession(); toggleSidebarMenu(false);">+ New Chat</button>
             
             <div class="history-section">
                 <div class="history-title">Recent Conversations</div>
@@ -128,22 +157,25 @@
         </div>
 
         <div class="side-bottom-nav">
-            <button class="nav-card-btn" onclick="openPlansModal()">💎 View Premium Plans <span>➔</span></button>
-            <div class="account-widget" id="user-status-area">
-                <div class="avatar">M</div>
+            <button class="nav-card-btn" onclick="openPlansModal(); toggleSidebarMenu(false);">💎 View Premium Plans <span>➔</span></button>
+            <div class="account-widget" id="user-status-area" style="display: none;">
+                <div class="avatar" id="user-avatar-tag">M</div>
                 <div style="text-align: left;">
                     <div style="font-size:13px;font-weight:600;" id="lbl-username">Miten Patel</div>
                     <div style="font-size:11px;color:#22c55e;" id="lbl-plan">Free Plan</div>
                 </div>
                 <button style="margin-left:auto; background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer;" onclick="mockSignOut()">SignOut</button>
             </div>
-            <button class="nav-card-btn" id="btn-mock-signin" style="display: none; justify-content: center; background: #10a37f;" onclick="mockSignIn()">Sign In with Google</button>
+            <button class="nav-card-btn" id="btn-mock-signin" style="justify-content: center; background: #10a37f;" onclick="openAuthModal(); toggleSidebarMenu(false);">Sign In Context</button>
         </div>
     </div>
 
-    <!-- MAIN ENGINE WORKSPACE -->
     <div class="workspace">
-        <!-- WELCOME LANDING -->
+        <div class="mobile-header">
+            <button class="menu-toggle-btn" onclick="toggleSidebarMenu(true)">☰</button>
+            <h2>miten.ai</h2>
+        </div>
+
         <div class="welcome-hub" id="home-dashboard">
             <h1>What can I help with today?</h1>
             <div class="cards-grid">
@@ -154,11 +186,9 @@
             </div>
         </div>
 
-        <!-- CONVERSATION VIEWER -->
         <div class="conversation-flow" id="chat-viewport"></div>
         <div class="pulse-loader" id="sys-loader">miten.ai is thinking...</div>
 
-        <!-- CONSOLE INPUT COMPONENT -->
         <div class="console-container">
             <div class="console-bar">
                 <div class="upload-preview-area" id="img-preview-box">
@@ -176,7 +206,6 @@
         </div>
     </div>
 
-    <!-- PREMIUM PLANS MODAL VIEW -->
     <div class="modal-view" id="pricing-modal">
         <div class="modal-box">
             <span class="close-modal-btn" onclick="closePlansModal()">✕</span>
@@ -194,7 +223,7 @@
                             <li>✓ Standard processing latency</li>
                         </ul>
                     </div>
-                    <button class="plan-btn" onclick="selectPlan('Free Plan')">Current Active</button>
+                    <button class="plan-btn" id="btn-plan-free" onclick="triggerPaymentFlow('Free Tier', 0)">Current Active</button>
                 </div>
                 <div class="plan-card pro">
                     <div style="position:absolute; top:-10px; right:15px; background:#10a37f; font-size:10px; padding:3px 8px; border-radius:20px; font-weight:700;">POPULAR</div>
@@ -207,7 +236,7 @@
                             <li>✓ 3x faster server response rate</li>
                         </ul>
                     </div>
-                    <button class="plan-btn" onclick="selectPlan('Pro Plus ($20)')">Upgrade Now</button>
+                    <button class="plan-btn" id="btn-plan-pro" onclick="triggerPaymentFlow('Plus Pro', 20)">Upgrade Now</button>
                 </div>
                 <div class="plan-card">
                     <div>
@@ -219,9 +248,60 @@
                             <li>✓ Dedicated technical customer support</li>
                         </ul>
                     </div>
-                    <button class="plan-btn" onclick="selectPlan('Enterprise Max ($40)')">Purchase Custom</button>
+                    <button class="plan-btn" id="btn-plan-ultra" onclick="triggerPaymentFlow('Enterprise Max', 40)">Purchase Custom</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-view" id="auth-modal">
+        <div class="gateway-box">
+            <span class="close-modal-btn" onclick="closeAuthModal()">✕</span>
+            <div class="gateway-title">🔒 miten.ai Authorization</div>
+            <div id="auth-form-content">
+                <div class="gateway-form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="txt-auth-email" placeholder="name@domain.com" value="miten.patel@gmail.com">
+                </div>
+                <div class="gateway-form-group">
+                    <label>Password</label>
+                    <input type="password" id="txt-auth-pass" placeholder="••••••••" value="password123">
+                </div>
+                <button class="gateway-btn" onclick="executeOriginalAuth()">Verify & Authenticate</button>
+            </div>
+            <div class="spinner" id="auth-spinner"></div>
+            <div id="auth-success-msg" style="display:none; text-align:center; color:#22c55e; font-size:14px; margin-top:10px;">✓ Authentication Confirmed. Synchronizing Node Secure Session...</div>
+        </div>
+    </div>
+
+    <div class="modal-view" id="payment-modal">
+        <div class="gateway-box">
+            <span class="close-modal-btn" onclick="closePaymentModal()">✕</span>
+            <div class="gateway-title">💳 Secure Encryption Gateway</div>
+            <div id="payment-form-content">
+                <p style="font-size:14px; margin-bottom:15px; color:#e4e4e7;">Upgrading Node Engine Node to: <strong id="lbl-checkout-plan" style="color:#10a37f;"></strong></p>
+                <div class="gateway-form-group">
+                    <label>Cardholder Name</label>
+                    <input type="text" placeholder="Miten Patel">
+                </div>
+                <div class="gateway-form-group">
+                    <label>Card Number</label>
+                    <input type="text" placeholder="4111 •••• •••• 9921">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="gateway-form-group">
+                        <label>Expiry Date</label>
+                        <input type="text" placeholder="12/29">
+                    </div>
+                    <div class="gateway-form-group">
+                        <label>CVC / CVV</label>
+                        <input type="password" placeholder="•••">
+                    </div>
+                </div>
+                <button class="gateway-btn" id="btn-pay-action" onclick="executeOriginalPayment()">Authorize Secure Checkout</button>
+            </div>
+            <div class="spinner" id="payment-spinner"></div>
+            <div id="payment-success-msg" style="display:none; text-align:center; color:#22c55e; font-size:14px; margin-top:10px;">✓ Transaction Authenticated! Node Upgraded Successfully.</div>
         </div>
     </div>
 
@@ -229,10 +309,22 @@
         let currentSessionHistory = [];
         let activeSessionId = null;
         let base64SelectedImage = null;
+        let selectedPendingPlan = "";
 
-        function stopAudioEngine() {
-            window.speechSynthesis.cancel();
+        // સિક્રેટ રિસ્પોન્સિવ ઓપ્શન: સાઇડબાર ઓપન / ક્લોઝ
+        function toggleSidebarMenu(state) {
+            const side = document.getElementById('app-sidebar-node');
+            const mask = document.getElementById('sidebar-overlay-mask');
+            if (state) {
+                side.classList.add('open');
+                mask.style.display = 'block';
+            } else {
+                side.classList.remove('open');
+                mask.style.display = 'none';
+            }
         }
+
+        function stopAudioEngine() { window.speechSynthesis.cancel(); }
 
         function triggerDefaultField(val) {
             document.getElementById('main-user-input').value = val;
@@ -299,12 +391,8 @@
             screen.style.display = 'flex';
 
             let userContentHTML = `<div class="bubble-chat user-bubble">`;
-            if (base64SelectedImage) {
-                userContentHTML += `<img src="${base64SelectedImage}" class="preview-img-msg" />`;
-            }
-            if (promptText) {
-                userContentHTML += `<p>${promptText}</p>`;
-            }
+            if (base64SelectedImage) { userContentHTML += `<img src="${base64SelectedImage}" class="preview-img-msg" />`; }
+            if (promptText) { userContentHTML += `<p>${promptText}</p>`; }
             userContentHTML += `</div>`;
 
             screen.innerHTML += `<div class="block-row user-block">${userContentHTML}</div>`;
@@ -350,7 +438,6 @@
 
                 currentSessionHistory.push({ role: 'user', text: promptText || "Sent an image" });
                 currentSessionHistory.push({ role: 'ai', text: data.reply });
-
                 screen.scrollTop = screen.scrollHeight;
 
             } catch (err) {
@@ -359,23 +446,74 @@
             }
         }
 
+        // ORIGINAL AUTHENTICATION FLOWS
+        function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuthModal() { 
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('auth-form-content').style.display = 'block';
+            document.getElementById('auth-spinner').style.display = 'none';
+            document.getElementById('auth-success-msg').style.display = 'none';
+        }
+        function executeOriginalAuth() {
+            const email = document.getElementById('txt-auth-email').value;
+            if(!email) { alert("Please input valid configuration context."); return; }
+            document.getElementById('auth-form-content').style.display = 'none';
+            document.getElementById('auth-spinner').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('auth-spinner').style.display = 'none';
+                document.getElementById('auth-success-msg').style.display = 'block';
+                setTimeout(() => {
+                    closeAuthModal();
+                    document.getElementById('btn-mock-signin').style.display = 'none';
+                    document.getElementById('user-status-area').style.display = 'flex';
+                    document.getElementById('lbl-username').innerText = email.split('@')[0];
+                    document.getElementById('user-avatar-tag').innerText = email.charAt(0).toUpperCase();
+                }, 1500);
+            }, 2000);
+        }
+
         function mockSignOut() {
             document.getElementById('user-status-area').style.display = 'none';
             document.getElementById('btn-mock-signin').style.display = 'flex';
-        }
-        function mockSignIn() {
-            document.getElementById('btn-mock-signin').style.display = 'none';
-            document.getElementById('user-status-area').style.display = 'flex';
-            document.getElementById('lbl-username').innerText = "Verified User";
             document.getElementById('lbl-plan').innerText = "Free Plan";
         }
 
+        // ORIGINAL PRICING & TRANSACTION GATEWAY FLOWS
         function openPlansModal() { document.getElementById('pricing-modal').style.display = 'flex'; }
         function closePlansModal() { document.getElementById('pricing-modal').style.display = 'none'; }
-        function selectPlan(planName) {
-            document.getElementById('lbl-plan').innerText = planName;
-            alert(`Miten.ai Protocol: Successfully activated ${planName}!`);
+        
+        function triggerPaymentFlow(planName, price) {
+            if(price === 0) {
+                document.getElementById('lbl-plan').innerText = "Free Plan";
+                closePlansModal();
+                return;
+            }
+            selectedPendingPlan = planName;
+            document.getElementById('lbl-checkout-plan').innerText = `${planName} - $${price}/mo`;
             closePlansModal();
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+            document.getElementById('payment-form-content').style.display = 'block';
+            document.getElementById('payment-spinner').style.display = 'none';
+            document.getElementById('payment-success-msg').style.display = 'none';
+        }
+
+        function executeOriginalPayment() {
+            document.getElementById('payment-form-content').style.display = 'none';
+            document.getElementById('payment-spinner').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('payment-spinner').style.display = 'none';
+                document.getElementById('payment-success-msg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('lbl-plan').innerText = selectedPendingPlan;
+                    closePaymentModal();
+                }, 1500);
+            }, 2500);
         }
     </script>
 </body>
